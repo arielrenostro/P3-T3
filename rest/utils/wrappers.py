@@ -2,6 +2,7 @@ import traceback
 from functools import wraps
 
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import Unauthorized
 
 from rest.exceptions.request import RequestException
 
@@ -20,6 +21,13 @@ def exception_handler(fn):
             return fn(*args, **kwargs)
         except RequestException as e:
             return e.body, e.http_status
+        except Unauthorized as e:
+            body = {
+                'fail': {
+                    'text': e.description
+                }
+            }
+            return body, e.code
         except Exception as e:
             if isinstance(e, IntegrityError):
                 if 'UNIQUE' in str(e):

@@ -4,6 +4,7 @@ from flask_restful import Resource
 from rest.controller.user import UserController
 from rest.exceptions.request import RequestException
 from rest.models.user import User
+from rest.oauth import oauth
 from rest.utils.wrappers import authenticated, exception_handler
 
 
@@ -12,7 +13,7 @@ class UserApi(Resource):
     _controller: UserController = UserController()
 
     @exception_handler
-    @authenticated
+    @oauth.require_oauth()
     def get(self):
         users = self._controller.find_all()
         return list(
