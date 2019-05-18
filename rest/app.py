@@ -1,6 +1,6 @@
 from flask import Flask
 
-from rest.database import init_db
+from rest.dao.database import init_db
 from rest.routes import api
 
 
