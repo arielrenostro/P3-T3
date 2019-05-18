@@ -1,0 +1,1 @@
+gunicorn rest.app:app -b localhost:8080
