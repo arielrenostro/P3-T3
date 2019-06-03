@@ -1,18 +1,15 @@
-from sqlalchemy import Column, String, Numeric, Integer, ForeignKey
-from sqlalchemy.orm import relationship
-
-from rest.dao.database import Base
+from rest.dao.database import db
 
 
-class Order(Base):
+class Order(db.Model):
 
     __tablename__ = 'order'
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User")
-    products = Column(String(250))
-    total_value = Column(Numeric(2))
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User")
+    products = db.Column(db.String(250))
+    total_value = db.Column(db.Numeric(2))
 
     def __init__(self, user=None, products=None, total_value=None):
         self.user = user

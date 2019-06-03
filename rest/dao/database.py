@@ -1,25 +1,28 @@
 from abc import ABC
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker, Session
 
-engine = create_engine('sqlite:////tmp/test.db', convert_unicode=True)
-db_session = scoped_session(
-    session_factory=sessionmaker(
-        bind=engine,
-        expire_on_commit=False,
-        autocommit=False,
-        autoflush=False
-    )
-)
-Base = declarative_base()
-Base.query = db_session.query_property()
+db = SQLAlchemy()
+#
+# engine = create_engine('sqlite:////tmp/test.db', convert_unicode=True)
+# db_session = scoped_session(
+#     session_factory=sessionmaker(
+#         bind=engine,
+#         expire_on_commit=False,
+#         autocommit=False,
+#         autoflush=False
+#     )
+# )
+# Base = declarative_base()
+# Base.query = db_session.query_property()
 
-
-def init_db():
-    import rest.models
-    Base.metadata.create_all(bind=engine)
+#
+# def init_db():
+#     import rest.models
+#     Base.metadata.create_all(bind=engine)
 
 
 class DAO(ABC):
@@ -39,7 +42,7 @@ class DAO(ABC):
         return self._entity_class.query.get(id_)
 
     def update(self, entity):
-        session: Session = db_session()
+        session: Session = db.session()
 
         session.add(entity)
         session.commit()
@@ -48,7 +51,7 @@ class DAO(ABC):
         return entity
 
     def delete(self, entity):
-        session = db_session()
+        session: Session = db.session()
 
         session.delete(entity)
         session.commit()

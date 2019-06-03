@@ -1,63 +1,109 @@
-import hashlib
+from flask import session
+from flask_oauthlib.provider import OAuth1Provider
 
-from flask_oauthlib.provider import OAuth2Provider
-
-from rest.dao.database import db_session
-from rest.models.token import Token
+from rest.dao.database import db
+from rest.models.oauth.access_token import AccessToken
+from rest.models.oauth.client import Client
+from rest.models.oauth.nonce import Nonce
+from rest.models.oauth.request_token import RequestToken
 from rest.models.user import User
 
 
-oauth = OAuth2Provider()
+oauth = OAuth1Provider()
 
 
-@oauth.clientgetter
-def get_user(user_id):
-    return User.query.get(int(user_id))
-
-
-@oauth.grantgetter
-def get_grant(client_id, code):
-    # return Grant.query.filter_by(client_id=client_id, code=code).first() TODO ARIEL
+def current_user():
+    if 'id' in session:
+        uid = session['id']
+        return User.query.get(uid)
     return None
 
 
-@oauth.tokengetter
-def get_token(access_token=None, refresh_token=None):
-    if access_token:
-        return Token.query.filter_by(access_token=access_token).first()
+@oauth.clientgetter
+def load_client(client_key):
+    return Client.query.get(client_key)
+
+
+@oauth.grantgetter
+def load_request_token(token):
+    return RequestToken.query.filter_by(token=token).first()
 
 
 @oauth.grantsetter
-def set_grant(client_id, code, request, *args, **kwargs):
-    # expires = datetime.utcnow() + timedelta(seconds=100)
-    # grant = Grant(
-    #     client_id=client_id,
-    #     code=code['code'],
-    #     redirect_uri=request.redirect_uri,
-    #     scope=' '.join(request.scopes),
-    #     user_id=g.user.id,
-    #     expires=expires,
-    # )
-    # db.session.add(grant)
-    # db.session.commit()
-    pass
+def save_request_token(token, request):
+    if hasattr(oauth, 'realms') and oauth.realms:
+        realms = ' '.join(request.realms)
+    else:
+        realms = None
+    grant = RequestToken(
+        token=token['oauth_token'],
+        secret=token['oauth_token_secret'],
+        client=request.client,
+        redirect_uri=request.redirect_uri,
+        _realms=realms,
+    )
+    db.session.add(grant)
+    db.session.commit()
+    return grant
+
+
+@oauth.verifiergetter
+def load_verifier(verifier, token):
+    return RequestToken.query.filter_by(
+        verifier=verifier, token=token
+    ).first()
+
+
+@oauth.verifiersetter
+def save_verifier(token, verifier, *args, **kwargs):
+    tok = RequestToken.query.filter_by(token=token).first()
+    tok.verifier = verifier['oauth_verifier']
+    tok.user = current_user()
+    db.session.add(tok)
+    db.session.commit()
+    return tok
+
+
+@oauth.noncegetter
+def load_nonce(client_key, timestamp, nonce, request_token, access_token):
+    return Nonce.query.filter_by(
+        client_key=client_key,
+        timestamp=timestamp,
+        nonce=nonce,
+        request_token=request_token,
+        access_token=access_token
+    ).first()
+
+
+@oauth.noncesetter
+def save_nonce(client_key, timestamp, nonce, request_token, access_token):
+    nonce = Nonce(
+        client_key=client_key,
+        timestamp=timestamp,
+        nonce=nonce,
+        request_token=request_token,
+        access_token=access_token,
+    )
+    db.session.add(nonce)
+    db.session.commit()
+    return nonce
+
+
+@oauth.tokengetter
+def load_access_token(client_key, token, *args, **kwargs):
+    return AccessToken.query.filter_by(
+        client_key=client_key, token=token
+    ).first()
 
 
 @oauth.tokensetter
-def set_token(token, request, *args, **kwargs):
-    tok = Token(**token)
-    tok.user_id = request.user.id
-
-    # tok.client_id = request.client.client_id
-    session = db_session()
-    session.add(tok)
-    session.commit()
-
-
-@oauth.usergetter
-def get_user(username, password, *args, **kwargs):
-    m = hashlib.sha512()
-    m.update(str(password).encode("utf-8"))
-    password = str(m.hexdigest())
-
-    return User.query.filter_by(email=username, password=password).first()
+def save_access_token(token, request):
+    tok = AccessToken(
+        client=request.client,
+        user=request.user,
+        token=token['oauth_token'],
+        secret=token['oauth_token_secret'],
+        _realms=token['oauth_authorized_realms'],
+    )
+    db.session.add(tok)
+    db.session.commit()

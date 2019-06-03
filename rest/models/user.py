@@ -1,17 +1,13 @@
-import hashlib
-
-from sqlalchemy import Column, String, Integer
-
-from rest.dao.database import Base
+from rest.dao.database import db
 
 
-class User(Base):
+class User(db.Model):
 
     __tablename__ = 'user'
 
-    id = Column(Integer, primary_key=True)
-    email = Column(String(250), unique=True)
-    password = Column(String(250))
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(250), unique=True)
+    password = db.Column(db.String(250))
 
     def __init__(self, email=None, password=None):
         self.password = password
@@ -22,7 +18,6 @@ class User(Base):
 
     def __setattr__(self, key, value):
         if key == 'password':
-            m = hashlib.sha512()
-            m.update(str(value).encode("utf-8"))
-            value = str(m.hexdigest())
+            from rest.controller.user import UserController
+            value = UserController.hash_password(value)
         super().__setattr__(key, value)
