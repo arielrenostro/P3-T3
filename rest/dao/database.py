@@ -46,7 +46,6 @@ class DAO(ABC):
 
         session.add(entity)
         session.commit()
-        session.close()
 
         return entity
 
@@ -55,4 +54,3 @@ class DAO(ABC):
 
         session.delete(entity)
         session.commit()
-        session.close()

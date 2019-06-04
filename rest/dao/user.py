@@ -1,4 +1,5 @@
 from rest.dao.database import DAO
+from rest.dao.token import TokenDAO
 from rest.models.user import User
 
 
@@ -13,3 +14,9 @@ class UserDAO(DAO):
             email=email,
             password=password
         ).first()
+
+    def delete(self, entity):
+        _token_dao = TokenDAO()
+        _token_dao.delete_by_user(entity)
+
+        super().delete(entity)

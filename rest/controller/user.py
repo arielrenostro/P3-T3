@@ -28,5 +28,6 @@ class UserController(Controller):
         m.update(encoded_password)
         return str(m.hexdigest())
 
-    def find_by_email_password(self, email, password):
-        return self._dao.find_by_email_password(email, password)
+    def find_hashing_password(self, email, password):
+        hashed_password = self.hash_password(password)
+        return self._dao.find_by_email_password(email, hashed_password)
