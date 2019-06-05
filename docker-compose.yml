@@ -17,10 +17,10 @@ services:
     networks:
       - p3t3
 
-  postgres:
-    image: postgres:11.3-alpine
-    networks:
-      - p3t3
+#  postgres:
+#    image: postgres:11.3-alpine
+#    networks:
+#      - p3t3
 
 networks:
   p3t3:
