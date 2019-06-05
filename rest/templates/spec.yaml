@@ -1,0 +1,374 @@
+swagger: "2.0"
+info:
+  description: "Documentação do trabalho 3 backend <br>Ariel Adonai Souza<br>Gabriel Garcia<br>Programação 3<br>Furb 2019/01"
+  version: "1.0.0"
+  title: "RestAPI Furb"
+host: "localhost:5000"
+basePath: "/RestAPIFurb"
+tags:
+- name: "login"
+  description: "Faz login na API e gera o cookie de autenticação"
+- name: "comandas"
+  description: "Operações de comanda"
+- name: "usuarios"
+  description: "Operações do usuário"
+schemes:
+- "http"
+paths:
+  /login:
+    post:
+      tags:
+      - "login"
+      summary: "Faz login na aplicação"
+      description: ""
+      operationId: "login"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Modelo de login"
+        required: true
+        schema:
+          $ref: "#/definitions/Login"
+      responses:
+        200:
+          description: "Autorizado"
+        403:
+          description: "Não autorizado"
+
+  /comandas:
+    get:
+      tags:
+      - "comandas"
+      summary: "Busca todas as comandas"
+      description: "Retorna as comandas"
+      operationId: "getComanda"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Sucesso"
+          schema:
+            $ref: "#/definitions/Comandas"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Nenhuma comanda encontrada"
+      security:
+      - x-furb: []
+
+    post:
+      tags:
+      - "comandas"
+      summary: "Insere uma nova comanda"
+      description: ""
+      operationId: "insertComanda"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Modelo da comanda"
+        required: true
+        schema:
+          $ref: "#/definitions/ComandaSemID"
+      responses:
+        201:
+          description: "Sucesso"
+          schema:
+            $ref: "#/definitions/Comanda"
+        400:
+          description: "Request inválido"
+        403:
+          description: "Não autorizado"
+        409:
+          description: "Duplicado"
+      security:
+      - x-furb: []
+
+  /comandas/{id_comanda}:
+    get:
+      tags:
+      - "comandas"
+      summary: "Busca a comanda pelo ID"
+      description: "Retorna a comanda identificada pelo ID"
+      operationId: "getComandaPorID"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id_comanda"
+        in: "path"
+        description: "ID da comanda"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Sucesso"
+          schema:
+            $ref: "#/definitions/Comanda"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Comanda não encontrada"
+      security:
+      - x-furb: []
+
+    put:
+      tags:
+      - "comandas"
+      summary: "Altera uma comanda pelo ID"
+      description: ""
+      operationId: "updateComandaPorID"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id_comanda"
+        in: "path"
+        description: "ID da comanda"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "Modelo da comanda"
+        required: true
+        schema:
+          $ref: "#/definitions/ComandaSemID"
+      responses:
+        200:
+          description: "Sucesso"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Comanda não encontrada"
+      security:
+      - x-furb: []
+
+    delete:
+      tags:
+      - "comandas"
+      summary: "Deleta uma comanda pelo ID"
+      description: ""
+      operationId: "deleteComandaPorId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id_comanda"
+        in: "path"
+        description: "ID da comanda"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Excluído"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Comanda não encontrada"
+      security:
+      - x-furb: []
+
+  /usuarios:
+    get:
+      tags:
+      - "usuarios"
+      summary: "Busca todas os usuarios"
+      description: "Retorna os usuarios"
+      operationId: "getUsuarios"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Sucesso"
+          schema:
+            $ref: "#/definitions/Usuarios"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Nenhum usuário encontrado"
+      security:
+      - x-furb: []
+
+    post:
+      tags:
+      - "usuarios"
+      summary: "Insere um novo usuário"
+      description: ""
+      operationId: "insertUsuario"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Modelo do usuário"
+        required: true
+        schema:
+          $ref: "#/definitions/UsuarioSemID"
+      responses:
+        201:
+          description: "Sucesso"
+          schema:
+            $ref: "#/definitions/Usuario"
+        400:
+          description: "Request inválido"
+        403:
+          description: "Não autorizado"
+      security:
+      - x-furb: []
+
+  /usuarios/{id_usuario}:
+    get:
+      tags:
+      - "usuarios"
+      summary: "Busca o usuário pelo ID"
+      description: "Retorna o usuário identificado pelo ID"
+      operationId: "getUsuarioPorId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id_usuario"
+        in: "path"
+        description: "ID do usuário"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Sucesso"
+          schema:
+            $ref: "#/definitions/Usuario"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Usuário não encontrado"
+      security:
+      - x-furb: []
+
+    put:
+      tags:
+      - "usuarios"
+      summary: "Altera um usuário pelo ID"
+      description: ""
+      operationId: "updateUsuarioPorID"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id_usuario"
+        in: "path"
+        description: "ID do usuário"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "body"
+        in: "body"
+        description: "Modelo do usuáriio"
+        required: true
+        schema:
+          $ref: "#/definitions/UsuarioSemID"
+      responses:
+        200:
+          description: "Sucesso"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Usuário não encontrado"
+      security:
+      - x-furb: []
+
+    delete:
+      tags:
+      - "usuarios"
+      summary: "Deleta um usuário pelo ID"
+      description: ""
+      operationId: "deleteUsuarioPorId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id_usuario"
+        in: "path"
+        description: "ID do usuário"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Excluído"
+        403:
+          description: "Não autorizado"
+        404:
+          description: "Usuário não encontrado"
+      security:
+      - x-furb: []
+
+
+securityDefinitions:
+  x-furb:
+    type: "apiKey"
+    name: "X-Furb-Authorization"
+    in: "header"
+
+
+definitions:
+  Login:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      senha:
+        type: "string"
+  Comanda:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      idusuario:
+        type: "string"
+      produtos:
+        type: "string"
+      valortotal:
+        type: "string"
+  ComandaSemID:
+    type: "object"
+    properties:
+      idusuario:
+        type: "string"
+      produtos:
+        type: "string"
+      valortotal:
+        type: "string"
+  Comandas:
+    type: "array"
+    items:
+      $ref: "#/definitions/Comanda"
+  Usuario:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      email:
+        type: "string"
+        format: "email"
+      senha:
+        type: "string"
+  UsuarioSemID:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      senha:
+        type: "string"
+  Usuarios:
+    type: "array"
+    items:
+      $ref: "#/definitions/Usuario"

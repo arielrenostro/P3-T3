@@ -29,7 +29,11 @@ class LoginApi(Resource):
         headers = {
             'Set-Cookie': cookie.output(header='')
         }
-        return token, HTTPStatus.OK, headers
+
+        body = {
+            'token': token
+        }
+        return body, HTTPStatus.OK, headers
 
     def _validate_request(self):
         if not request.json:

@@ -1,0 +1,27 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - 5000:8080
+    networks:
+      - p3t3
+
+  swagger:
+    #image: npalm/swagger-ui
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8080:8080
+    environment:
+      API_URL: http://localhost:5000/RestAPIFurb/spec
+    networks:
+      - p3t3
+
+  postgres:
+    image: postgres:11.3-alpine
+    networks:
+      - p3t3
+
+networks:
+  p3t3:
+    driver: bridge
