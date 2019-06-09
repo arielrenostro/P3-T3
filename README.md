@@ -13,7 +13,7 @@ A autenticação é somente um token gerado pelo e-mail e senha, e setando o coo
 
 ## Para subir a aplicação
 ```shell
-docker-compose up -d --build --force-rebuild
+docker-compose up -d --build --force-recreate
 ``` 
 
 ## Portas
